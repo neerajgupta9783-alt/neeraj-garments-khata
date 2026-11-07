@@ -1,0 +1,20 @@
+{
+  "id": "./",
+  "name": "Neeraj Garments Khata",
+  "short_name": "Neeraj Khata",
+  "description": "Neeraj Garments customer credit and payment ledger",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f6fc",
+  "theme_color": "#172554",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

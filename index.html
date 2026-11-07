@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#172554">
+<meta name="description" content="Neeraj Garments digital khata for customer credit and payments.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Neeraj Garments Khata</title>
+<style>
+:root{--navy:#172554;--blue:#2563eb;--bg:#f3f6fc;--ink:#172033;--muted:#64748b;--line:#e2e8f0;--green:#15803d;--red:#b91c1c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input{font:inherit}button{border:0;border-radius:11px;padding:12px 15px;background:var(--blue);color:white;font-weight:700;cursor:pointer}button:disabled{opacity:.5}
+button.secondary{background:#e8efff;color:#1d4ed8}button.ghost{background:#f1f5f9;color:#334155}button.danger{background:#fee2e2;color:#991b1b}
+header{background:var(--navy);color:white;padding:17px max(16px,calc((100% - 1050px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:11px}.logo{width:42px;height:42px;border-radius:12px;background:#fff;color:var(--navy);display:grid;place-items:center;font-size:22px}
+h1{font-size:18px;line-height:1.15;margin:0}header small{color:#cbd5e1;letter-spacing:1.4px;font-size:10px}
+main{max-width:1050px;margin:20px auto;padding:0 15px 40px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:15px}
+.card,.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 3px 12px #0f172a08}
+.card small{color:var(--muted);display:block;font-size:12px}.card strong{display:block;font-size:22px;margin-top:5px}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}.toolbar input{flex:1;min-width:160px}
+input{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:12px;background:#fff;color:var(--ink);outline-color:var(--blue)}
+.layout{display:grid;grid-template-columns:330px 1fr;gap:14px}.panel h2{font-size:17px;margin:0 0 12px}
+.customer{border:1px solid var(--line);border-radius:12px;padding:12px;margin:8px 0;cursor:pointer}
+.customer.active{background:#eff6ff;border-color:#93c5fd}.customer-line{display:flex;justify-content:space-between;gap:8px;font-weight:700}.muted{font-size:12px;color:var(--muted)}
+.red{color:var(--red)}.green{color:var(--green)}.actions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.entry{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding:13px 0}.entry strong{display:block}.amount{text-align:right;font-weight:800;white-space:nowrap}
+.empty{text-align:center;color:var(--muted);padding:28px 12px}
+label{display:block;font-weight:700;font-size:13px;margin:12px 0 6px}
+.modal{position:fixed;inset:0;background:#0f172a99;display:none;align-items:flex-end;justify-content:center;padding:12px;z-index:10}
+.modal.show{display:flex}.dialog{width:min(480px,100%);max-height:92vh;overflow:auto;background:white;border-radius:18px;padding:20px}
+.dialog h2{margin:0 0 8px}.dialogfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.pin-screen{position:fixed;inset:0;background:var(--bg);z-index:30;display:flex;align-items:center;justify-content:center;padding:20px}
+.pin-box{width:min(380px,100%);text-align:center;background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px;box-shadow:0 12px 35px #0f172a12}
+.pin-logo{font-size:40px;color:var(--navy)}.pin-box h2{margin:8px 0 3px;color:var(--navy)}
+.pin-box input{text-align:center;font-size:24px;letter-spacing:12px;margin:14px 0}
+.notice{background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:12px;font-size:12px;color:#854d0e;margin-top:16px}
+.footer-note{font-size:12px;color:var(--muted);margin:15px 2px}
+.hidden{display:none!important}
+@media(max-width:720px){.cards{grid-template-columns:1fr 1fr}.card:last-child{grid-column:span 2}.layout{grid-template-columns:1fr}.customer-list{max-height:310px;overflow:auto}header{padding:15px}.header-actions button{padding:9px 10px;font-size:12px}}
+@media(min-width:721px){.modal{align-items:center}.customer-list{max-height:560px;overflow:auto}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand"><div class="logo">♧</div><div><h1>NEERAJ GARMENTS</h1><small>SMART DIGITAL KHATA</small></div></div>
+ <div class="header-actions"><button class="secondary" id="installBtn" hidden>Install app</button></div>
+</header>
+<main>
+ <section class="cards">
+  <div class="card"><small>Total outstanding to collect</small><strong id="totalDue">₹0.00</strong></div>
+  <div class="card"><small>Customers</small><strong id="customerCount">0</strong></div>
+  <div class="card"><small>Transactions</small><strong id="transactionCount">0</strong></div>
+ </section>
+ <div class="toolbar"><button id="addCustomerBtn">＋ Add customer</button><input id="search" placeholder="Search customer name or phone"></div>
+ <section class="layout">
+  <div class="panel"><h2>Customers</h2><div id="customerList" class="customer-list"><div class="empty">No customers added yet.</div></div></div>
+  <div class="panel" id="details"><div class="empty">Choose a customer to view their khata.</div></div>
+ </section>
+ <div class="panel" style="margin-top:14px">
+  <h2>Data & backup</h2>
+  <div class="actions">
+   <button class="secondary" id="backupBtn">Download backup</button>
+   <button class="secondary" id="restoreBtn">Restore backup</button>
+   <button class="ghost" id="csvBtn">Export CSV</button>
+   <input class="hidden" type="file" id="restoreFile" accept="application/json,.json">
+  </div>
+  <div class="muted">Your records currently stay in this browser on this device. Download backups regularly. Cloud sync is not connected yet.</div>
+ </div>
+ <p class="footer-note">Neeraj Garments V4 PWA starter · Keep your phone locked. Do not store real customer data until you have tested backup and restore.</p>
+</main>
+
+<div class="modal" id="customerModal"><div class="dialog">
+ <h2 id="customerTitle">Add customer</h2><form id="customerForm">
+ <input type="hidden" id="customerId">
+ <label>Customer name *</label><input id="customerName" maxlength="80" required placeholder="Customer name">
+ <label>Phone number (optional)</label><input id="customerPhone" maxlength="20" inputmode="tel" placeholder="Phone number">
+ <div class="dialogfoot"><button type="button" class="ghost" data-close="customerModal">Cancel</button><button>Save customer</button></div>
+ </form></div></div>
+
+<div class="modal" id="transactionModal"><div class="dialog">
+ <h2 id="transactionTitle">Add entry</h2><form id="transactionForm">
+ <input type="hidden" id="transactionCustomerId"><input type="hidden" id="transactionType">
+ <label>Amount (₹) *</label><input id="transactionAmount" type="number" min="0.01" step="0.01" required placeholder="0.00">
+ <label>Date *</label><input id="transactionDate" type="date" required>
+ <label>Details (optional)</label><input id="transactionNote" maxlength="120" placeholder="e.g. Jeans purchase / UPI payment">
+ <div class="dialogfoot"><button type="button" class="ghost" data-close="transactionModal">Cancel</button><button>Save entry</button></div>
+ </form></div></div>
+
+<div class="pin-screen" id="pinScreen"><div class="pin-box">
+ <div class="pin-logo">♧</div><h2>NEERAJ GARMENTS</h2><div class="muted">SMART DIGITAL KHATA</div>
+ <h3 id="pinHeading">Create your 4-digit PIN</h3><div class="muted" id="pinSub">Set a PIN to protect your khata.</div>
+ <form id="pinForm"><input id="pinInput" type="password" inputmode="numeric" autocomplete="one-time-code" maxlength="4" pattern="[0-9]{4}" placeholder="••••" required><button style="width:100%">Continue</button></form>
+ <div class="muted red" id="pinError" style="margin-top:10px"></div>
+ <div class="notice">PIN is requested once per calendar day on this device. This is a basic convenience lock, not full account security. Do not forget your PIN.</div>
+</div></div>
+
+<script>
+const DBKEY='ng_v4_pwa_data', PINKEY='ng_v4_pin_hash', SALTKEY='ng_v4_pin_salt', UNLOCKKEY='ng_v4_unlocked_day';
+let db=loadDB(), selected=null, deferredInstall=null;
+function loadDB(){try{return JSON.parse(localStorage.getItem(DBKEY))||{customers:[],transactions:[]}}catch{return {customers:[],transactions:[]}}}
+function saveDB(){localStorage.setItem(DBKEY,JSON.stringify(db));render()}
+function dayKey(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function uid(){return crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(16).slice(2)}`}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function money(v){return '₹'+Number(v||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function balance(id){return db.transactions.filter(t=>t.customerId===id).reduce((a,t)=>a+(t.type==='udhar'?Number(t.amount):-Number(t.amount)),0)}
+function showModal(id){document.getElementById(id).classList.add('show')}
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.dataset.close)));
+
+function render(){
+ document.getElementById('totalDue').textContent=money(db.customers.reduce((s,c)=>s+Math.max(0,balance(c.id)),0));
+ document.getElementById('customerCount').textContent=db.customers.length;
+ document.getElementById('transactionCount').textContent=db.transactions.length;
+ renderCustomers(); if(selected)renderDetails(); else document.getElementById('details').innerHTML='<div class="empty">Choose a customer to view their khata.</div>';
+}
+function renderCustomers(){
+ const q=document.getElementById('search').value.trim().toLowerCase();
+ const rows=db.customers.filter(c=>(c.name+' '+(c.phone||'')).toLowerCase().includes(q));
+ document.getElementById('customerList').innerHTML=rows.length?rows.map(c=>`<div class="customer ${selected===c.id?'active':''}" data-id="${esc(c.id)}"><div class="customer-line"><span>${esc(c.name)}</span><span class="${balance(c.id)>0?'red':'green'}">${money(balance(c.id))}</span></div><div class="muted">${esc(c.phone||'No phone number')}</div></div>`).join(''):'<div class="empty">No matching customers.</div>';
+ document.querySelectorAll('.customer[data-id]').forEach(el=>el.addEventListener('click',()=>{selected=el.dataset.id;render()}));
+}
+function renderDetails(){
+ const c=db.customers.find(x=>x.id===selected);if(!c){selected=null;render();return}
+ const tx=db.transactions.filter(t=>t.customerId===selected).sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt-a.createdAt);
+ const bal=balance(c.id);
+ document.getElementById('details').innerHTML=`<div class="customer-line"><div><h2 style="margin:0">${esc(c.name)}</h2><div class="muted">${esc(c.phone||'No phone number')}</div></div><button class="ghost" id="editCustomer">Edit</button></div>
+ <p>Outstanding balance: <strong class="${bal>0?'red':'green'}">${money(bal)}</strong></p>
+ <div class="actions"><button id="udharBtn">＋ Give Udhar</button><button class="secondary" id="jamaBtn">＋ Record Jama</button></div>
+ <h2 style="margin-top:20px">Transaction history</h2>
+ ${tx.length?tx.map(t=>`<div class="entry"><div><strong>${t.type==='udhar'?'Udhar given':'Jama received'}</strong><div class="muted">${esc(t.date)}${t.note?' · '+esc(t.note):''}</div></div><div class="amount ${t.type==='udhar'?'red':'green'}">${t.type==='udhar'?'+':'−'}${money(t.amount)}<br><button class="ghost" style="padding:5px 8px;font-size:11px;margin-top:5px" data-delete="${esc(t.id)}">Delete</button></div></div>`).join(''):'<div class="empty">No entries yet for this customer.</div>'}`;
+ document.getElementById('editCustomer').onclick=()=>editCustomer(c.id);
+ document.getElementById('udharBtn').onclick=()=>openTransaction('udhar');
+ document.getElementById('jamaBtn').onclick=()=>openTransaction('jama');
+ document.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>{if(confirm('Delete this entry? The balance will be recalculated.')){db.transactions=db.transactions.filter(t=>t.id!==b.dataset.delete);saveDB()}});
+}
+document.getElementById('addCustomerBtn').onclick=()=>{document.getElementById('customerForm').reset();document.getElementById('customerId').value='';document.getElementById('customerTitle').textContent='Add customer';showModal('customerModal')};
+function editCustomer(id){const c=db.customers.find(x=>x.id===id);document.getElementById('customerId').value=id;document.getElementById('customerName').value=c.name;document.getElementById('customerPhone').value=c.phone||'';document.getElementById('customerTitle').textContent='Edit customer';showModal('customerModal')}
+document.getElementById('customerForm').onsubmit=e=>{e.preventDefault();const id=document.getElementById('customerId').value;const name=document.getElementById('customerName').value.trim(),phone=document.getElementById('customerPhone').value.trim();if(id)Object.assign(db.customers.find(c=>c.id===id),{name,phone});else{const id2=uid();db.customers.push({id:id2,name,phone});selected=id2}closeModal('customerModal');saveDB()};
+function openTransaction(type){document.getElementById('transactionForm').reset();document.getElementById('transactionCustomerId').value=selected;document.getElementById('transactionType').value=type;document.getElementById('transactionTitle').textContent=type==='udhar'?'Give Udhar':'Record Jama';document.getElementById('transactionDate').value=dayKey();showModal('transactionModal')}
+document.getElementById('transactionForm').onsubmit=e=>{e.preventDefault();const amount=Number(document.getElementById('transactionAmount').value);if(!(amount>0))return alert('Enter an amount greater than zero.');db.transactions.push({id:uid(),customerId:document.getElementById('transactionCustomerId').value,type:document.getElementById('transactionType').value,amount,date:document.getElementById('transactionDate').value,note:document.getElementById('transactionNote').value.trim(),createdAt:Date.now()});closeModal('transactionModal');saveDB()};
+document.getElementById('search').addEventListener('input',renderCustomers);
+
+function downloadBlob(content,type,name){const blob=new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+document.getElementById('backupBtn').onclick=()=>downloadBlob(JSON.stringify({app:'Neeraj Garments Khata',version:1,exportedAt:new Date().toISOString(),...db},null,2),'application/json','neeraj-garments-backup.json');
+document.getElementById('restoreBtn').onclick=()=>document.getElementById('restoreFile').click();
+document.getElementById('restoreFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{const obj=JSON.parse(await file.text());if(!Array.isArray(obj.customers)||!Array.isArray(obj.transactions))throw Error();if(confirm('Replace current data with this backup? Download a backup of current data first if needed.')){db={customers:obj.customers,transactions:obj.transactions};selected=null;saveDB();alert('Backup restored.')}}catch{alert('This backup file is not valid.')}e.target.value=''};
+document.getElementById('csvBtn').onclick=()=>{const rows=[['Customer','Phone','Date','Entry type','Amount','Note','Current balance']];db.transactions.forEach(t=>{const c=db.customers.find(x=>x.id===t.customerId);if(c)rows.push([c.name,c.phone||'',t.date,t.type==='udhar'?'Udhar given':'Jama received',t.amount,t.note||'',balance(c.id)])});const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');downloadBlob('\ufeff'+csv,'text/csv;charset=utf-8','neeraj-garments-ledger.csv')};
+
+async function digest(pin,salt){const bytes=new TextEncoder().encode(salt+':'+pin);const hash=await crypto.subtle.digest('SHA-256',bytes);return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('')}
+async function setupPin(){
+ const hasPin=localStorage.getItem(PINKEY),unlocked=localStorage.getItem(UNLOCKKEY)===dayKey();
+ if(hasPin&&unlocked){document.getElementById('pinScreen').classList.add('hidden');return}
+ const heading=document.getElementById('pinHeading'),sub=document.getElementById('pinSub'),input=document.getElementById('pinInput');
+ heading.textContent=hasPin?'Enter your daily PIN':'Create your 4-digit PIN';
+ sub.textContent=hasPin?'Unlock Neeraj Garments for today.':'Choose a 4-digit PIN for this device.';
+ document.getElementById('pinForm').onsubmit=async e=>{e.preventDefault();const pin=input.value;if(!/^\d{4}$/.test(pin)){document.getElementById('pinError').textContent='Enter exactly 4 digits.';return}
+ if(!hasPin){const salt=crypto.getRandomValues(new Uint8Array(16));const salt64=btoa(String.fromCharCode(...salt));localStorage.setItem(SALTKEY,salt64);localStorage.setItem(PINKEY,await digest(pin,salt64))}
+ else{const saved=await digest(pin,localStorage.getItem(SALTKEY));if(saved!==hasPin){document.getElementById('pinError').textContent='Incorrect PIN. Try again.';input.value='';return}}
+ localStorage.setItem(UNLOCKKEY,dayKey());document.getElementById('pinScreen').classList.add('hidden');render();
+ };
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&localStorage.getItem(UNLOCKKEY)!==dayKey()){document.getElementById('pinScreen').classList.remove('hidden');setupPin()}});
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;const b=document.getElementById('installBtn');b.hidden=false;b.onclick=async()=>{deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;b.hidden=true}});
+if('serviceWorker' in navigator && location.protocol!=='file:'){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}
+render();setupPin();
+</script>
+</body>
+</html>
